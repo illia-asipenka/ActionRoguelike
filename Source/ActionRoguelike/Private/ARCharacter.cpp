@@ -2,6 +2,8 @@
 
 
 #include "ARCharacter.h"
+
+#include "ARInteractionComponent.h"
 #include "Camera\CameraComponent.h"
 #include "GameFramework\SpringArmComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
@@ -18,7 +20,10 @@ AARCharacter::AARCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	InteractionComp = CreateDefaultSubobject<UARInteractionComponent>("InteractionComponent");
+
 	bUseControllerRotationYaw = false;
+	AttackDelay = 0.2f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
@@ -51,6 +56,8 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARCharacter::PrimaryInteract);
 }
 
 void AARCharacter::MoveForward(float Value)
@@ -74,9 +81,21 @@ void AARCharacter::MoveRight(float Value)
 
 void AARCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackMontage);
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
+}
+	
+
+void AARCharacter::PrimaryAttack_TimeElapsed()
+{
 	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+}
+
+void AARCharacter::PrimaryInteract()
+{
+	InteractionComp->PrimaryInteract();
 }
