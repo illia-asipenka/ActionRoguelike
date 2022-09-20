@@ -29,7 +29,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ChestMeshComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMeshComponent;
 
 public:
@@ -37,6 +37,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
-	
+
+	UFUNCTION(BlueprintCallable)
 	void ToggleChestLid();
 };
