@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SphereComponent.h"
-#include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+#include "ARProjectileBase.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "ARMagicProjectile.generated.h"
 
 UCLASS()
-class ACTIONROGUELIKE_API AARMagicProjectile : public AActor
+class ACTIONROGUELIKE_API AARMagicProjectile : public AARProjectileBase
 {
 	GENERATED_BODY()
 
@@ -18,16 +17,19 @@ public:
 	AARMagicProjectile();
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* ProjectileMovementComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* ParticleSystemComponent;
 	
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float ProjectileSpeed = 500.0f;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	URadialForceComponent* RadialForceComponent;
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyForce();
 
 public:
 	

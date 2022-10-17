@@ -32,7 +32,10 @@ protected:
 	UARInteractionComponent* InteractionComp;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> MagicProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> WarpProjectileClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackMontage;
@@ -43,6 +46,8 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void SecondaryAttack();
+	void SecondaryAttack_TimeElapsed();
 	void PrimaryAttack_TimeElapsed();
 	void PrimaryInteract();
 

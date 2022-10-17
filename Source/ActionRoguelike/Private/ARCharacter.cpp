@@ -55,6 +55,7 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &AARCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARCharacter::PrimaryInteract);
@@ -84,15 +85,46 @@ void AARCharacter::PrimaryAttack()
 	PlayAnimMontage(AttackMontage);
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
 }
+
+void AARCharacter::SecondaryAttack()
+{
+	PlayAnimMontage(AttackMontage);
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::SecondaryAttack_TimeElapsed, AttackDelay);
+}
+
+void AARCharacter::SecondaryAttack_TimeElapsed()
+{
+	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	const FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 	
+	const FTransform SpawnTM = FTransform(GetControlRotation(), ProjectileSpawnLocation);
+
+	GetWorld()->SpawnActor<AActor>(WarpProjectileClass, SpawnTM, SpawnParams);
+}
+
 
 void AARCharacter::PrimaryAttack_TimeElapsed()
 {
 	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	SpawnParams.Instigator = this;
+
+	FHitResult Hit;
+	FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams::AllObjects;
+	FVector TraceStart = CameraComp->GetComponentLocation();
+	FVector TraceEnd = TraceStart + CameraComp->GetForwardVector()*1000000;
+	bool bIsHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
+	UE_LOG(LogTemp, Warning, TEXT("Hit result: %s"), bIsHit ? TEXT("True") : TEXT("False"));
+
+	FRotator ProjectileSpawnRotation = bIsHit ? (Hit.ImpactPoint - HandLocation).Rotation() : GetControlRotation();
+	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, ProjectileSpawnLocation);
+
+	GetWorld()->SpawnActor<AActor>(MagicProjectileClass, SpawnTM, SpawnParams);
 }
 
 void AARCharacter::PrimaryInteract()
