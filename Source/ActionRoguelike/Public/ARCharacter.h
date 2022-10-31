@@ -36,19 +36,31 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> WarpProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> AbilityProjectileClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackMontage;
+	UAnimMontage* PrimaryAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* SecondaryAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AbilityMontage;
 
 	FTimerHandle AttackTimerHandle;
 	float AttackDelay;
+	float AbilityDelay;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
 	void SecondaryAttack();
+	void Ability();
 	void SecondaryAttack_TimeElapsed();
 	void PrimaryAttack_TimeElapsed();
+	void Ability_TimeElapsed();
 	void PrimaryInteract();
 
 	// Called when the game starts or when spawned

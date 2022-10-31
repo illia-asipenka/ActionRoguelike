@@ -24,6 +24,7 @@ AARCharacter::AARCharacter()
 
 	bUseControllerRotationYaw = false;
 	AttackDelay = 0.2f;
+	AbilityDelay = 0.4f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
@@ -56,6 +57,7 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AARCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &AARCharacter::SecondaryAttack);
+	PlayerInputComponent->BindAction("Ability", IE_Pressed, this, &AARCharacter::Ability);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARCharacter::PrimaryInteract);
@@ -82,14 +84,20 @@ void AARCharacter::MoveRight(float Value)
 
 void AARCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackMontage);
+	PlayAnimMontage(PrimaryAttackMontage);
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
 }
 
 void AARCharacter::SecondaryAttack()
 {
-	PlayAnimMontage(AttackMontage);
+	PlayAnimMontage(SecondaryAttackMontage);
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::SecondaryAttack_TimeElapsed, AttackDelay);
+}
+
+void AARCharacter::Ability()
+{
+	PlayAnimMontage(AbilityMontage);
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::Ability_TimeElapsed, AttackDelay);
 }
 
 void AARCharacter::SecondaryAttack_TimeElapsed()
@@ -125,6 +133,19 @@ void AARCharacter::PrimaryAttack_TimeElapsed()
 	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, ProjectileSpawnLocation);
 
 	GetWorld()->SpawnActor<AActor>(MagicProjectileClass, SpawnTM, SpawnParams);
+}
+
+void AARCharacter::Ability_TimeElapsed()
+{
+	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	const FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
+	
+	const FTransform SpawnTM = FTransform(GetControlRotation(), ProjectileSpawnLocation);
+
+	GetWorld()->SpawnActor<AActor>(AbilityProjectileClass, SpawnTM, SpawnParams);
 }
 
 void AARCharacter::PrimaryInteract()
