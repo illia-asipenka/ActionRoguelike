@@ -3,6 +3,7 @@
 
 #include "ARCharacter.h"
 
+#include "ARAttributeComponent.h"
 #include "ARInteractionComponent.h"
 #include "Camera\CameraComponent.h"
 #include "GameFramework\SpringArmComponent.h"
@@ -21,6 +22,8 @@ AARCharacter::AARCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<UARInteractionComponent>("InteractionComponent");
+
+	AttributeComp = CreateDefaultSubobject<UARAttributeComponent>("AttributeComponent");
 
 	bUseControllerRotationYaw = false;
 	AttackDelay = 0.2f;

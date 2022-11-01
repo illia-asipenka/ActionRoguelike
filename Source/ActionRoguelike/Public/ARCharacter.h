@@ -10,6 +10,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UARInteractionComponent;
 class UAnimMontage;
+class UARAttributeComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API AARCharacter : public ACharacter
@@ -22,14 +23,17 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UARInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARAttributeComponent* AttributeComp;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> MagicProjectileClass;
