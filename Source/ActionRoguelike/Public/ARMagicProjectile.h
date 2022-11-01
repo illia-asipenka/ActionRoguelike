@@ -30,6 +30,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void ApplyForce();
+	
+	UFUNCTION()
+	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
 	

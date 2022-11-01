@@ -2,6 +2,8 @@
 
 #include "ARMagicProjectile.h"
 
+#include "ARAttributeComponent.h"
+
 // Sets default values
 AARMagicProjectile::AARMagicProjectile()
 {
@@ -26,12 +28,28 @@ void AARMagicProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AARMagicProjectile::OnActorOverlap);
 	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
 }
 
 void AARMagicProjectile::ApplyForce()
 {
 	RadialForceComponent->FireImpulse();
+}
+
+void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComponent, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor && OtherActor != GetInstigator())
+	{
+		UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
+		if(Attribute)
+		{
+			Attribute->ApplyHealthChange(-20);
+
+			Destroy();
+		}
+	}
 }
 
 // Called every frame
