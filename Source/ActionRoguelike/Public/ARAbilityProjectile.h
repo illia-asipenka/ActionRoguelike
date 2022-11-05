@@ -14,30 +14,17 @@ public:
 
 protected:	
 	virtual void BeginPlay() override;
-	virtual void PostInitializeComponents() override;
-	
-public:	
-	virtual void Tick(float DeltaTime) override;
 
-private:
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UParticleSystem* ExplodeParticle;
-	
+private:	
 	FTimerHandle LifespanTimerHandle;
 	FTimerHandle TeleportationTimerHandle;
 	float LifespanSeconds;
 	float TeleportationDelaySeconds;
-
+	
 	UFUNCTION()
-	void ExplodeProjectile();
-
-	UFUNCTION()
-	void OnHitAction(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	UFUNCTION()
-	void SetProjectileLifeSpan();
-
+	void SetProjectileLifeSpan();	
 	UFUNCTION()
 	void TeleportPlayer();
+
+	virtual void Explode_Implementation() override;
 };

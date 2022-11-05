@@ -1,7 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARMagicProjectile.h"
-
 #include "ARAttributeComponent.h"
 
 // Sets default values
@@ -18,16 +17,10 @@ AARMagicProjectile::AARMagicProjectile()
 	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
 }
 
-// Called when the game starts or when spawned
-void AARMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();	
-}
-
 void AARMagicProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
+	
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AARMagicProjectile::OnActorOverlap);
 	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
 }
@@ -47,13 +40,15 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		{
 			Attribute->ApplyHealthChange(-20);
 
-			Destroy();
+			Explode();
 		}
 	}
 }
 
-// Called every frame
-void AARMagicProjectile::Tick(float DeltaTime)
+void AARMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Super::Tick(DeltaTime);
+	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
+
+	ApplyForce();
 }

@@ -2,6 +2,7 @@
 
 
 #include "ARProjectileBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AARProjectileBase::AARProjectileBase()
@@ -10,8 +11,8 @@ AARProjectileBase::AARProjectileBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-	RootComponent = SphereComponent;
 	SphereComponent->SetCollisionProfileName("Projectile");
+	RootComponent = SphereComponent;
 
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("Particle");
 	ParticleSystemComponent->SetupAttachment(SphereComponent);
@@ -20,19 +21,34 @@ AARProjectileBase::AARProjectileBase()
 	ProjectileMovementComponent->InitialSpeed = 1000.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;
+	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 }
 
-// Called when the game starts or when spawned
-void AARProjectileBase::BeginPlay()
+void AARProjectileBase::PostInitializeComponents()
 {
-	Super::BeginPlay();
-	
+	Super::PostInitializeComponents();
+
+	SphereComponent->OnComponentHit.AddDynamic(this, &AARProjectileBase::OnActorHit);
 }
 
-// Called every frame
-void AARProjectileBase::Tick(float DeltaTime)
+void AARProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Super::Tick(DeltaTime);
+	if(OtherActor && OtherActor != GetInstigator())
+	{
+		Explode();		
+	}
+}
 
+void AARProjectileBase::Explode_Implementation()
+{
+	if (ensure(!IsPendingKill()))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticle, GetActorLocation(), GetActorRotation());
+
+		UE_LOG(LogTemp, Warning, TEXT("Spawned particle"));
+
+		Destroy();
+	}
 }
 

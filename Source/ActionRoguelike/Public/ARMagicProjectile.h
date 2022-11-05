@@ -12,29 +12,21 @@ class ACTIONROGUELIKE_API AARMagicProjectile : public AARProjectileBase
 {
 	GENERATED_BODY()
 
-public:
-	
+public:	
 	AARMagicProjectile();
 
 protected:
-	
-	virtual void BeginPlay() override;
-
 	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float ProjectileSpeed = 500.0f;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	URadialForceComponent* RadialForceComponent;
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyForce();
-	
+	void ApplyForce();	
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-public:
-	
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 };

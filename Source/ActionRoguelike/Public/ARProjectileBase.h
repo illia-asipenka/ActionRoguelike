@@ -9,7 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "ARProjectileBase.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class ACTIONROGUELIKE_API AARProjectileBase : public AActor
 {
 	GENERATED_BODY()
@@ -19,20 +19,19 @@ public:
 	AARProjectileBase();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComponent;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovementComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* ParticleSystemComponent;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* ExplodeParticle;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	UFUNCTION()
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Explode();
 };
