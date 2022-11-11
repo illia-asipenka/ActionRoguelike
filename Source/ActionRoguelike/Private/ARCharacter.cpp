@@ -32,18 +32,11 @@ AARCharacter::AARCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-// Called when the game starts or when spawned
-void AARCharacter::BeginPlay()
+void AARCharacter::PostInitializeComponents()
 {
-	Super::BeginPlay();
-	
-}
+	Super::PostInitializeComponents();
 
-// Called every frame
-void AARCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	AttributeComp->OnHealthChanged.AddDynamic(this, &AARCharacter::OnHealthChanged);
 }
 
 // Called to bind functionality to input
@@ -64,6 +57,22 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARCharacter::PrimaryInteract);
+}
+
+void AARCharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeComponent* OwningComp, float NewHealth,
+	float Delta)
+{
+	if(Delta < 0)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+	}
+
+	
+	if(NewHealth <= 0 && Delta < 0)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
 }
 
 void AARCharacter::MoveForward(float Value)

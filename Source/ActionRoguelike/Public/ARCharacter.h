@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AbilityMontage;
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor,class UARAttributeComponent* OwningComp, float NewHealth, float Delta);
+
 	FTimerHandle AttackTimerHandle;
 	float AttackDelay;
 	float AbilityDelay;
@@ -67,12 +70,9 @@ protected:
 	void Ability_TimeElapsed();
 	void PrimaryInteract();
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
