@@ -26,9 +26,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovementComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UParticleSystemComponent* ParticleSystemComponent;
+	UParticleSystemComponent* ParticleSystemComponent;	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UParticleSystem* ExplodeParticle;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	USoundBase* ImpactSound;
 
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);	

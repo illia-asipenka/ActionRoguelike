@@ -22,7 +22,8 @@ void AARMagicProjectile::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AARMagicProjectile::OnActorOverlap);
-	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
+	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;	
 }
 
 void AARMagicProjectile::ApplyForce()
@@ -38,7 +39,7 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
 		if(Attribute)
 		{
-			Attribute->ApplyHealthChange(-20);
+			Attribute->ApplyHealthChange(-DamageAmount);
 
 			Explode();
 		}

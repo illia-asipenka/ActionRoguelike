@@ -21,6 +21,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float ProjectileSpeed = 500.0f;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float DamageAmount = 50.0f;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	URadialForceComponent* RadialForceComponent;
 
 	UFUNCTION(BlueprintCallable)

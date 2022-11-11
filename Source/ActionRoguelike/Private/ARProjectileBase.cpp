@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ARProjectileBase.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -16,6 +14,10 @@ AARProjectileBase::AARProjectileBase()
 
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("Particle");
 	ParticleSystemComponent->SetupAttachment(SphereComponent);
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>("AudioComponent");
+	AudioComponent->SetupAttachment(SphereComponent);
+	AudioComponent->bAutoActivate = true;
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovementComponent->InitialSpeed = 1000.0f;
@@ -36,7 +38,7 @@ void AARProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Ot
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
-		Explode();		
+		Explode();
 	}
 }
 
@@ -45,10 +47,11 @@ void AARProjectileBase::Explode_Implementation()
 	if (ensure(!IsPendingKill()))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticle, GetActorLocation(), GetActorRotation());
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+		AudioComponent->Stop();
 
 		UE_LOG(LogTemp, Warning, TEXT("Spawned particle"));
 
 		Destroy();
 	}
 }
-

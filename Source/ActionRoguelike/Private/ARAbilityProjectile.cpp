@@ -1,5 +1,6 @@
 ﻿#include "ARAbilityProjectile.h"
 
+#include "Components/AudioComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,7 +15,8 @@ AARAbilityProjectile::AARAbilityProjectile()
 void AARAbilityProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
 	SetProjectileLifeSpan();
 }
 
@@ -30,6 +32,8 @@ void AARAbilityProjectile::Explode_Implementation()
 	ProjectileMovementComponent->StopMovementImmediately();
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplodeParticle, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	AudioComponent->Stop();
 
 	SetActorEnableCollision(false);
 
