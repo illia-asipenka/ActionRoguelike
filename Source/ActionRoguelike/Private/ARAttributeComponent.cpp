@@ -7,7 +7,7 @@
 // Sets default values for this component's properties
 UARAttributeComponent::UARAttributeComponent()
 {
-	Health = 100.0f;
+	Health = HealthMax;
 }
 
 bool UARAttributeComponent::IsAlive() const
@@ -17,7 +17,7 @@ bool UARAttributeComponent::IsAlive() const
 
 bool UARAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	OnHealthChanged.Broadcast(GetOwner(), this, Health, Delta);
 
