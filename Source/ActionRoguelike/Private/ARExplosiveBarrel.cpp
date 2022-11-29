@@ -1,10 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ARExplosiveBarrel.h"
-
 #include "DrawDebugHelpers.h"
-
 
 // Sets default values
 AARExplosiveBarrel::AARExplosiveBarrel()
