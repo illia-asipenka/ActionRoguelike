@@ -4,34 +4,29 @@
 #include "ARHealthPotion.h"
 #include "ARAttributeComponent.h"
 #include "ARCharacter.h"
-#include "Kismet/GameplayStatics.h"
 
 
-// Sets default values
 AARHealthPotion::AARHealthPotion()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	PotionMesh = CreateDefaultSubobject<UStaticMeshComponent>("PotionMesh");
-	RootComponent = PotionMesh;
 }
 
 void AARHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
-	UARAttributeComponent* HealthComponent = Cast<UARAttributeComponent>(InstigatorPawn->GetComponentByClass(UARAttributeComponent::StaticClass()));
-
-	if(HealthComponent && !HealthComponent->IsFullHealth())
-	{		
-		HealthComponent->ApplyHealthChange(HealthToRestore);
-		bCanInteract = false;
-		PotionMesh->SetVisibility(false);
-		GetWorld()->GetTimerManager().SetTimer(TimerToRespawn,this, &AARHealthPotion::RespawnPotion, 10.0f);
-	}
+	Super::Interact_Implementation(InstigatorPawn);
 }
 
-void AARHealthPotion::RespawnPotion()
+bool AARHealthPotion::CheckInteractConditions_Implementation(APawn* InstigatorPawn)
 {
-	bCanInteract = true;
-	PotionMesh->SetVisibility(true);
+	const UARAttributeComponent* HealthComponent = Cast<UARAttributeComponent>(InstigatorPawn->GetComponentByClass(UARAttributeComponent::StaticClass()));
+	const bool CheckResult = HealthComponent && !HealthComponent->IsFullHealth();
+	
+	return CheckResult;
+}
+
+void AARHealthPotion::ApplyPowerUpEffect_Implementation(APawn* InstigatorPawn)
+{
+	UARAttributeComponent* HealthComponent = Cast<UARAttributeComponent>(InstigatorPawn->GetComponentByClass(UARAttributeComponent::StaticClass()));
+
+	HealthComponent->ApplyHealthChange(HealthToRestore);
 }

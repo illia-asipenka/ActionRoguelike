@@ -3,31 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ARGameplayInterface.h"
-#include "GameFramework/Actor.h"
+#include "ARPowerUpBase.h"
 #include "ARHealthPotion.generated.h"
 
 UCLASS()
-class ACTIONROGUELIKE_API AARHealthPotion : public AActor, public IARGameplayInterface
+class ACTIONROGUELIKE_API AARHealthPotion : public AARPowerUpBase
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AARHealthPotion();
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UStaticMeshComponent* PotionMesh;
-
+	
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float HealthToRestore = 10.0f;
 
-private:
-	bool bCanInteract = true;
-	FTimerHandle TimerToRespawn;
-
-	UFUNCTION()
-	void RespawnPotion();
+	virtual bool CheckInteractConditions_Implementation(APawn* InstigatorPawn) override;
+	
+	virtual void ApplyPowerUpEffect_Implementation(APawn* InstigatorPawn) override;
 };
