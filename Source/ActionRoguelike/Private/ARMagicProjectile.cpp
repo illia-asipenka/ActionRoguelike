@@ -2,6 +2,9 @@
 
 #include "ARMagicProjectile.h"
 #include "ARAttributeComponent.h"
+#include "ARCharacter.h"
+#include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AARMagicProjectile::AARMagicProjectile()
@@ -15,6 +18,20 @@ AARMagicProjectile::AARMagicProjectile()
 	RadialForceComponent->ImpulseStrength = 500.0f;
 	RadialForceComponent->bImpulseVelChange = true;
 	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
+}
+
+void AARMagicProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if(Cast<AARCharacter>(GetInstigator()))
+	{
+		AttachedComponent = UGameplayStatics::SpawnEmitterAttached(
+		AttachedParticle,
+		GetWorld()->GetFirstPlayerController()->GetCharacter()->GetMesh(),
+		TEXT("Muzzle_01")
+		);
+	}	
 }
 
 void AARMagicProjectile::PostInitializeComponents()
@@ -51,5 +68,6 @@ void AARMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* O
 {
 	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 
+	UGameplayStatics::PlayWorldCameraShake(GetWorld(), CameraShakeAsset, Hit.Location, 0, 1000.0f);
 	ApplyForce();
 }

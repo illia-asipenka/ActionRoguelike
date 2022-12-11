@@ -14,6 +14,7 @@ class ACTIONROGUELIKE_API AARMagicProjectile : public AARProjectileBase
 
 public:	
 	AARMagicProjectile();
+	virtual void BeginPlay() override;
 
 protected:
 	virtual void PostInitializeComponents() override;
@@ -24,7 +25,13 @@ protected:
 	float DamageAmount = 50.0f;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	URadialForceComponent* RadialForceComponent;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UParticleSystem* AttachedParticle;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UCameraShakeBase> CameraShakeAsset;
 
+	UParticleSystemComponent* AttachedComponent;
+	
 	UFUNCTION(BlueprintCallable)
 	void ApplyForce();	
 	UFUNCTION()
