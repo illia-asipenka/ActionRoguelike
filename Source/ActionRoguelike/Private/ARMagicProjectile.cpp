@@ -24,13 +24,11 @@ void AARMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StartSelfDestroyTimer();
+
 	if(Cast<AARCharacter>(GetInstigator()))
 	{
-		AttachedComponent = UGameplayStatics::SpawnEmitterAttached(
-		AttachedParticle,
-		GetWorld()->GetFirstPlayerController()->GetCharacter()->GetMesh(),
-		TEXT("Muzzle_01")
-		);
+		UGameplayStatics::SpawnEmitterAttached(AttachedParticle,GetWorld()->GetFirstPlayerController()->GetCharacter()->GetMesh(),HandSocketName);
 	}	
 }
 
@@ -41,6 +39,11 @@ void AARMagicProjectile::PostInitializeComponents()
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AARMagicProjectile::OnActorOverlap);
 	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
 	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;	
+}
+
+void AARMagicProjectile::StartSelfDestroyTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(TimerToSelfDestroy, this, &AARMagicProjectile::Explode, TimeToDestroy);
 }
 
 void AARMagicProjectile::ApplyForce()

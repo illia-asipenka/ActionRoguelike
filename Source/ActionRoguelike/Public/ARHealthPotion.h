@@ -15,11 +15,13 @@ public:
 	AARHealthPotion();
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float HealthToRestore = 10.0f;
+	UStaticMeshComponent* HealthPotionMesh;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float HealthToRestore = 10.0f;	
 
 	virtual bool CheckInteractConditions_Implementation(APawn* InstigatorPawn) override;
 	

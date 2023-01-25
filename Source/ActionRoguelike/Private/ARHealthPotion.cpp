@@ -8,7 +8,9 @@
 
 AARHealthPotion::AARHealthPotion()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	HealthPotionMesh = CreateDefaultSubobject<UStaticMeshComponent>("PowerUpMesh");
+	HealthPotionMesh->SetupAttachment(RootComponent);
+	HealthPotionMesh->SetCollisionProfileName("NoCollision");
 }
 
 void AARHealthPotion::Interact_Implementation(APawn* InstigatorPawn)

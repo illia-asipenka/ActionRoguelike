@@ -7,10 +7,9 @@
 // Sets default values
 AARPowerUpBase::AARPowerUpBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
-	PowerUpMesh = CreateDefaultSubobject<UStaticMeshComponent>("PowerUpMesh");
-	RootComponent = PowerUpMesh;
+	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+	SphereComponent->SetCollisionProfileName("PowerUp");
+	RootComponent = SphereComponent;
 }
 
 void AARPowerUpBase::BeginPlay()
@@ -43,13 +42,17 @@ bool AARPowerUpBase::CheckInteractConditions_Implementation(APawn* InstigatorPaw
 
 void AARPowerUpBase::SetRespawnTimer()
 {
-	bCanInteract = false;
-	PowerUpMesh->SetVisibility(false);
-	GetWorld()->GetTimerManager().SetTimer(TimerToRespawn,this, &AARPowerUpBase::RespawnPowerUp, RespawnSeconds);
+	TogglePowerUpVisibility(false);
+	GetWorld()->GetTimerManager().SetTimer(TimerToRespawn,this, &AARPowerUpBase::ShowPowerUp, RespawnSeconds);
 }
 
-void AARPowerUpBase::RespawnPowerUp()
+void AARPowerUpBase::TogglePowerUpVisibility(bool NewVisibility)
 {
-	bCanInteract = true;
-	PowerUpMesh->SetVisibility(true);
+	SetActorEnableCollision(NewVisibility);
+	RootComponent->SetVisibility(NewVisibility, true);
+}
+
+void AARPowerUpBase::ShowPowerUp()
+{
+	TogglePowerUpVisibility(true);
 }

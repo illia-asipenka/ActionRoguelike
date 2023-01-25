@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ARGameplayInterface.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "ARPowerUpBase.generated.h"
 
@@ -20,14 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UStaticMeshComponent* PowerUpMesh;
+	USphereComponent* SphereComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float RespawnSeconds = 10.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bSpawnFromStart = true;
-	UPROPERTY()
-	bool bCanInteract = true;
 	UPROPERTY()
 	FTimerHandle TimerToRespawn;
 
@@ -38,5 +37,7 @@ protected:
 	UFUNCTION()
 	void SetRespawnTimer();	
 	UFUNCTION()
-	void RespawnPowerUp();
+	void TogglePowerUpVisibility(bool NewVisibility);
+	UFUNCTION()
+	void ShowPowerUp();	
 };

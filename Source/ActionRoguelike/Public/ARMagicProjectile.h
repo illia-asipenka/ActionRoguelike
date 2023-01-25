@@ -30,7 +30,17 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UCameraShakeBase> CameraShakeAsset;
 
-	UParticleSystemComponent* AttachedComponent;
+	UPROPERTY()
+	FTimerHandle TimerToSelfDestroy;
+
+	UPROPERTY(EditDefaultsOnly)
+	float TimeToDestroy = 10.0f;
+	
+	UPROPERTY(VisibleAnywhere)
+	FName HandSocketName = "Muzzle_01";
+
+	UFUNCTION()
+	void StartSelfDestroyTimer();
 	
 	UFUNCTION(BlueprintCallable)
 	void ApplyForce();	
