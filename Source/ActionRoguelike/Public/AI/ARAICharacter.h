@@ -7,6 +7,8 @@
 #include "Perception/PawnSensingComponent.h"
 #include "ARAICharacter.generated.h"
 
+class UARAttributeComponent;
+
 UCLASS()
 class ACTIONROGUELIKE_API AARAICharacter : public ACharacter
 {
@@ -16,11 +18,19 @@ public:
 	// Sets default values for this character's properties
 	AARAICharacter();
 
-protected:
+	UFUNCTION()
+	bool IsLowHealth();
+
+protected:	
 	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARAttributeComponent* AttributeComp;
+	
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UARAttributeComponent* OwningComp, float NewHealth, float Delta);
 };

@@ -28,7 +28,7 @@ void AARMagicProjectile::BeginPlay()
 
 	if(Cast<AARCharacter>(GetInstigator()))
 	{
-		UGameplayStatics::SpawnEmitterAttached(AttachedParticle,GetWorld()->GetFirstPlayerController()->GetCharacter()->GetMesh(),HandSocketName);
+		UGameplayStatics::SpawnEmitterAttached(AttachedParticle, Cast<AARCharacter>(GetInstigator())->GetMesh(),HandSocketName);
 	}	
 }
 

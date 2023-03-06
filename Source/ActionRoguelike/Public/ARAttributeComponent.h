@@ -29,6 +29,9 @@ public:
 	bool IsAlive() const;
 
 	UFUNCTION(BlueprintCallable)
+	bool IsLowHealth() const;
+
+	UFUNCTION(BlueprintCallable)
 	bool IsFullHealth() const;
 	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
