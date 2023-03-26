@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ARWorldUserWidget.h"
 #include "GameFramework/Character.h"
 #include "Perception/PawnSensingComponent.h"
 #include "ARAICharacter.generated.h"
@@ -28,6 +29,14 @@ protected:
 	UPawnSensingComponent* PawnSensingComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARAttributeComponent* AttributeComp;
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UARWorldUserWidget* ActiveHealthBar;
+
+	void SetTargetActor(AActor* NewTarget);
 	
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);

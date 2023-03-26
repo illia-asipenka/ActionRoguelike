@@ -25,20 +25,37 @@ bool UARAttributeComponent::IsFullHealth() const
 	return Health == HealthMax;
 }
 
-bool UARAttributeComponent::ApplyHealthChange(float Delta)
+bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	const float OldHealth = Health;
+	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
-	OnHealthChanged.Broadcast(GetOwner(), this, Health, Delta);
+	const float ActualDelta = Health - OldHealth;
+
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
 
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
 
 	return true;
 }
 
+UARAttributeComponent* UARAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if(FromActor)
+	{
+		return Cast<UARAttributeComponent>(FromActor->GetComponentByClass(StaticClass()));
+	}
 
+	return nullptr;
+}
 
-
-
-
-
+bool UARAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UARAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if(AttributeComp)
+	{
+		return AttributeComp->IsAlive();
+	}
+	return false;
+}

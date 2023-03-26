@@ -46,7 +46,7 @@ void AARGameModeBase::SpawnBotTimerElapsed()
 	for(TActorIterator<AARAICharacter> It(GetWorld()); It; ++It)
 	{
 		AARAICharacter* Bot = *It;
-		UARAttributeComponent* AttributeComponent = Cast<UARAttributeComponent>(Bot->GetComponentByClass(UARAttributeComponent::StaticClass()));
+		UARAttributeComponent* AttributeComponent = UARAttributeComponent::GetAttributes(Bot);
 		if(ensure(AttributeComponent) && AttributeComponent->IsAlive())
 		{
 			NrOfAliveBots++;

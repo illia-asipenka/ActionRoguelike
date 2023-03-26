@@ -19,7 +19,7 @@ EBTNodeResult::Type UARBTTask_HealMyself::ExecuteTask(UBehaviorTreeComponent& Ow
 			return EBTNodeResult::Failed;
 		}
 
-		OwnerHealthComp->ApplyHealthChange(HealthToRestore);
+		OwnerHealthComp->ApplyHealthChange(OwnerCharacter ,HealthToRestore);
 		return EBTNodeResult::Succeeded;
 	}
 	

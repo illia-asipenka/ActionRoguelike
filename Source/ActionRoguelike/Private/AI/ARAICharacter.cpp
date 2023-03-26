@@ -3,10 +3,12 @@
 
 #include "AI/ARAICharacter.h"
 #include "ARAttributeComponent.h"
+#include "ARWorldUserWidget.h"
 #include "BrainComponent.h"
 #include "DrawDebugHelpers.h"
 #include "AI/ARAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AARAICharacter::AARAICharacter()
@@ -18,6 +20,8 @@ AARAICharacter::AARAICharacter()
 	AttributeComp = CreateDefaultSubobject<UARAttributeComponent>("HealthComponent");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	TimeToHitParamName = "TimeToHit";
 }
 
 void AARAICharacter::PostInitializeComponents()
@@ -30,15 +34,9 @@ void AARAICharacter::PostInitializeComponents()
 
 void AARAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	AARAIController* AIC = Cast<AARAIController>(GetController());
-	if(AIC)
-	{
-		UBlackboardComponent* BBComponent = AIC->GetBlackboardComponent();
-
-		BBComponent->SetValueAsObject("TargetActor", Pawn);
-
-		DrawDebugString(GetWorld(), GetActorLocation(), "Player Spotted!!!", nullptr, FColor::White, 4.0f, true);
-	}
+	SetTargetActor(Pawn);
+	
+	DrawDebugString(GetWorld(), GetActorLocation(), "Player Spotted!!!", nullptr, FColor::White, 0.5f, true);
 }
 
 void AARAICharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeComponent* OwningComp, float NewHealth,
@@ -46,6 +44,25 @@ void AARAICharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeCompon
 {
 	if(Delta < 0)
 	{
+
+		if(InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
+
+		if(ActiveHealthBar == nullptr)
+		{
+			ActiveHealthBar = CreateWidget<UARWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+
+			if(ActiveHealthBar)
+			{
+				ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
+		}	
+
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+		
 		if(NewHealth <= 0)
 		{
 			//stop BT
@@ -57,7 +74,7 @@ void AARAICharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeCompon
 
 			//ragdoll
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
-			GetMesh()->SetCollisionProfileName("Ragdoll");000
+			GetMesh()->SetCollisionProfileName("Ragdoll");
 
 			//set lifespan
 			SetLifeSpan(10.0f);
@@ -68,4 +85,16 @@ void AARAICharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeCompon
 bool AARAICharacter::IsLowHealth()
 {
 	return  AttributeComp->IsLowHealth();
+}
+
+
+
+void AARAICharacter::SetTargetActor(AActor* NewTarget)
+{
+	AARAIController* AIC = Cast<AARAIController>(GetController());
+	if(AIC)
+	{
+		AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);		
+	}
+
 }
