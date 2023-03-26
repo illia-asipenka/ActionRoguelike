@@ -59,7 +59,9 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 		UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
 		if(Attribute)
 		{
-			Attribute->ApplyHealthChange(-DamageAmount);
+			Attribute->ApplyHealthChange(GetInstigator(), -DamageAmount);
+			
+			UE_LOG(LogTemp, Warning, TEXT("Overlap Actor Name: %s"), *OtherActor->GetName());
 
 			Explode();
 		}
@@ -69,8 +71,9 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 void AARMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
-
 	UGameplayStatics::PlayWorldCameraShake(GetWorld(), CameraShakeAsset, Hit.Location, 0, 1000.0f);
 	ApplyForce();
+	UE_LOG(LogTemp, Warning, TEXT("Hit Actor Name: %s"), *OtherActor->GetName());
+
+	Super::OnActorHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 }

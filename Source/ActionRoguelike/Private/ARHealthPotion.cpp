@@ -30,5 +30,5 @@ void AARHealthPotion::ApplyPowerUpEffect_Implementation(APawn* InstigatorPawn)
 {
 	UARAttributeComponent* HealthComponent = Cast<UARAttributeComponent>(InstigatorPawn->GetComponentByClass(UARAttributeComponent::StaticClass()));
 
-	HealthComponent->ApplyHealthChange(HealthToRestore);
+	HealthComponent->ApplyHealthChange(this, HealthToRestore);
 }
