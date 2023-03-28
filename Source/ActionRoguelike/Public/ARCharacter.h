@@ -16,11 +16,7 @@ UCLASS()
 class ACTIONROGUELIKE_API AARCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this character's properties
-	AARCharacter();
-
+	
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
@@ -76,5 +72,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	AARCharacter();
 
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
 };

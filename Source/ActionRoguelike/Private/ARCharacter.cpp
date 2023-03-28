@@ -32,6 +32,11 @@ AARCharacter::AARCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AARCharacter::HealSelf(float Amount)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}
+
 void AARCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();

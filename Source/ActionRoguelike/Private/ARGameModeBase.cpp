@@ -73,3 +73,16 @@ void AARGameModeBase::SpawnBotTimerElapsed()
 		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AARGameModeBase::OnQueryCompleted);
 	}
 }
+
+void AARGameModeBase::KillAll()
+{
+	for(TActorIterator<AARAICharacter> It(GetWorld()); It; ++It)
+	{
+		AARAICharacter* Bot = *It;
+		UARAttributeComponent* AttributeComponent = UARAttributeComponent::GetAttributes(Bot);
+		if(ensure(AttributeComponent) && AttributeComponent->IsAlive())
+		{
+			AttributeComponent->Kill(this); //@fixme: pass in Player for kill credits?
+		}
+	}
+}

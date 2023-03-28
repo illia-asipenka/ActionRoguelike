@@ -10,6 +10,11 @@ UARAttributeComponent::UARAttributeComponent()
 	Health = HealthMax;
 }
 
+bool UARAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -HealthMax);
+}
+
 bool UARAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;
@@ -27,6 +32,11 @@ bool UARAttributeComponent::IsFullHealth() const
 
 bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	if(!GetOwner()->CanBeDamaged())
+	{
+		return false;
+	}
+	
 	const float OldHealth = Health;
 	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
@@ -37,7 +47,7 @@ bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
 
-	return true;
+	return ActualDelta != 0;
 }
 
 UARAttributeComponent* UARAttributeComponent::GetAttributes(AActor* FromActor)
