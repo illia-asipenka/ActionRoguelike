@@ -21,7 +21,10 @@ protected:
 	UStaticMeshComponent* HealthPotionMesh;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float HealthToRestore = 10.0f;	
+	float HealthToRestore = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int UseCost = 10;	
 
 	virtual bool CheckInteractConditions_Implementation(APawn* InstigatorPawn) override;
 	

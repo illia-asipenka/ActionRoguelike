@@ -3,11 +3,17 @@
 
 #include "ARGameModeBase.h"
 #include "ARAttributeComponent.h"
+#include "ARCharacter.h"
+#include "ARHealthPotion.h"
+#include "ARPickUpCoin.h"
+#include "ARPlayerState.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "AI/ARAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
+
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT(""), ECVF_Cheat);
 
 AARGameModeBase::AARGameModeBase()
 {
@@ -19,6 +25,7 @@ void AARGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &AARGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+	SpawnPowerUps();
 }
 
 void AARGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, 
@@ -40,8 +47,44 @@ void AARGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 	}
 }
 
+void AARGameModeBase::OnPowerUpQueryComplete(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+	EEnvQueryStatus::Type QueryStatus)
+{
+	if(QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn powerups EQS Query Failed!"));
+		return;
+	}	
+	
+	TArray<FVector> Locations;
+	QueryInstance->GetQueryResultsAsLocations(Locations);
+
+	const int MaxLoops = Locations.Num();
+
+	for (int i = 0; i < MaxLoops; ++i)
+	{
+		float Chance = FMath::FRand();
+		if(Chance < 0.15f)
+		{
+			bool ItemToSpawn = FMath::RandBool();
+			if(ItemToSpawn)
+				GetWorld()->SpawnActor<AActor>(PickUpCoinClass, FVector(Locations[i].X, Locations[i].Y, 70.f), FRotator::ZeroRotator);
+			else
+			{
+				GetWorld()->SpawnActor<AActor>(HealthPotionClass, FVector(Locations[i].X, Locations[i].Y, 70.f), FRotator::ZeroRotator);
+			}
+		}
+	}	
+}
+
 void AARGameModeBase::SpawnBotTimerElapsed()
 {
+	if(!CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Bot spawning disabled via char 'CVarSpawnBots'."));
+		return;
+	}
+	
 	int32 NrOfAliveBots = 0;
 	for(TActorIterator<AARAICharacter> It(GetWorld()); It; ++It)
 	{
@@ -74,6 +117,15 @@ void AARGameModeBase::SpawnBotTimerElapsed()
 	}
 }
 
+void AARGameModeBase::SpawnPowerUps()
+{
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnPowerUpsQuery, this, EEnvQueryRunMode::AllMatching, nullptr);
+	if(ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AARGameModeBase::OnPowerUpQueryComplete);
+	}
+}
+
 void AARGameModeBase::KillAll()
 {
 	for(TActorIterator<AARAICharacter> It(GetWorld()); It; ++It)
@@ -84,5 +136,48 @@ void AARGameModeBase::KillAll()
 		{
 			AttributeComponent->Kill(this); //@fixme: pass in Player for kill credits?
 		}
+	}
+}
+
+void AARGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
+{
+	AARCharacter* Player = Cast<AARCharacter>(Victim);
+
+	if(Player)
+	{
+		FTimerHandle TimerHandle_RespawnDelay;
+
+		FTimerDelegate OnPlayerKilled;
+		OnPlayerKilled.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
+
+		float RespawnDelay = 1.0f;
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, OnPlayerKilled, RespawnDelay, false);
+	}
+
+	Player = Cast<AARCharacter>(Killer);
+	if(Player)
+	{
+		AARPlayerState* PlayerState = Cast<AARPlayerState>(Player->GetPlayerState());
+
+		if(PlayerState)
+		{
+			PlayerState->AddCredits(CoinsForKill);
+		}
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(Victim), *GetNameSafe(Killer));
+}
+
+void AARGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if(ensure(Controller))
+	{
+		Controller->UnPossess();
+
+		UE_LOG(LogTemp, Log, TEXT("About to restart player"));
+		
+		RestartPlayer(Controller);
+		
 	}
 }

@@ -4,6 +4,7 @@
 #include "ARHealthPotion.h"
 #include "ARAttributeComponent.h"
 #include "ARCharacter.h"
+#include "ARPlayerState.h"
 
 
 AARHealthPotion::AARHealthPotion()
@@ -21,9 +22,15 @@ void AARHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 bool AARHealthPotion::CheckInteractConditions_Implementation(APawn* InstigatorPawn)
 {
 	const UARAttributeComponent* HealthComponent = Cast<UARAttributeComponent>(InstigatorPawn->GetComponentByClass(UARAttributeComponent::StaticClass()));
-	const bool CheckResult = HealthComponent && !HealthComponent->IsFullHealth();
+	AARPlayerState* PlayerState = Cast<AARPlayerState>(InstigatorPawn->GetPlayerState());
 	
-	return CheckResult;
+	
+	const bool HealthCheck = HealthComponent && !HealthComponent->IsFullHealth();
+	
+	if(PlayerState && HealthCheck)	
+		return  PlayerState->SubtractCredits(UseCost);	
+	
+	return false;
 }
 
 void AARHealthPotion::ApplyPowerUpEffect_Implementation(APawn* InstigatorPawn)

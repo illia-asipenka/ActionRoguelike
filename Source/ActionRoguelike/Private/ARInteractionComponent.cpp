@@ -2,8 +2,12 @@
 
 
 #include "ARInteractionComponent.h"
+
+#include "ARCharacter.h"
 #include "ARGameplayInterface.h"
 #include "DrawDebugHelpers.h"
+
+static TAutoConsoleVariable<bool> CVarDrawDebugInteractions(TEXT("su.DrawDebugInteractions"), true, TEXT(""), ECVF_Cheat);
 
 // Sets default values for this component's properties
 UARInteractionComponent::UARInteractionComponent()
@@ -36,24 +40,26 @@ void UARInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UARInteractionComponent::PrimaryInteract()
 {
+	bool DrawDebug = CVarDrawDebugInteractions.GetValueOnGameThread();
+	
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
-	AActor* MyOwner = GetOwner();
+	AARCharacter* MyOwner = Cast<AARCharacter>(GetOwner());
 
 	float Radius = 30.0f;
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FVector End = EyeLocation + EyeRotation.Vector() * 1000.0f;
+	FVector End = MyOwner->GetPawnViewLocation() + EyeRotation.Vector() * 1000.0f;
 	FCollisionShape Shape;
 	Shape.SetSphere(Radius);
 
 	TArray<FHitResult> Hits;	
 	
 	//GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
-	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams,Shape);
+	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, MyOwner->GetPawnViewLocation(), End, FQuat::Identity, ObjectQueryParams,Shape);
 	
 	FColor DebugColor = bBlockingHit ? FColor::Green : FColor::Red;
 
@@ -66,11 +72,18 @@ void UARInteractionComponent::PrimaryInteract()
 			{
 				APawn* MyPawn = Cast<APawn>(MyOwner);
 				IARGameplayInterface::Execute_Interact(HitActor, MyPawn);
-				DrawDebugSphere(GetWorld(), Hit.Location, Radius, 32, DebugColor, false, 2, 0, 2);
+
+				if(DrawDebug)
+				{
+					DrawDebugSphere(GetWorld(), Hit.Location, Radius, 32, DebugColor, false, 2, 0, 2);
+				}
 				break;
 			}
 		}
 	}
-
-	DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, 2, 0, 2);	
+	
+	if (DrawDebug)
+	{
+		DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, 2, 0, 2);	
+	}
 }

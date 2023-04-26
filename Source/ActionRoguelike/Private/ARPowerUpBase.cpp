@@ -24,7 +24,7 @@ void AARPowerUpBase::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if(CheckInteractConditions(InstigatorPawn))
 	{
-		ApplyPowerUpEffect(InstigatorPawn);
+		ApplyPowerUpEffect(InstigatorPawn); 
 		SetRespawnTimer();
 	}
 }

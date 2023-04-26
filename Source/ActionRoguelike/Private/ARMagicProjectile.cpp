@@ -3,6 +3,7 @@
 #include "ARMagicProjectile.h"
 #include "ARAttributeComponent.h"
 #include "ARCharacter.h"
+#include "ARGameplayFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -56,13 +57,17 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
-		UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
-		if(Attribute)
+		// UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
+		// if(Attribute)
+		// {
+		// 	Attribute->ApplyHealthChange(GetInstigator(), -DamageAmount);
+		// 	
+		// 	UE_LOG(LogTemp, Warning, TEXT("Overlap Actor Name: %s"), *OtherActor->GetName());
+		//
+		// 	Explode();
+		// }
+		if (UARGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
-			Attribute->ApplyHealthChange(GetInstigator(), -DamageAmount);
-			
-			UE_LOG(LogTemp, Warning, TEXT("Overlap Actor Name: %s"), *OtherActor->GetName());
-
 			Explode();
 		}
 	}
