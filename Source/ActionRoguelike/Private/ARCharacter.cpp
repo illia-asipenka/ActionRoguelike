@@ -3,6 +3,7 @@
 
 #include "ARCharacter.h"
 
+#include "ARActionComponent.h"
 #include "ARAttributeComponent.h"
 #include "ARInteractionComponent.h"
 #include "Camera\CameraComponent.h"
@@ -25,9 +26,9 @@ AARCharacter::AARCharacter()
 
 	AttributeComp = CreateDefaultSubobject<UARAttributeComponent>("AttributeComponent");
 
+	ActionComp = CreateDefaultSubobject<UARActionComponent>("ActionComponent");
+
 	bUseControllerRotationYaw = false;
-	AttackDelay = 0.2f;
-	AbilityDelay = 0.4f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
@@ -60,6 +61,8 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &AARCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("Ability", IE_Pressed, this, &AARCharacter::Ability);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AARCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AARCharacter::SprintStop);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AARCharacter::PrimaryInteract);
 }
@@ -106,68 +109,27 @@ void AARCharacter::MoveRight(float Value)
 
 void AARCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(PrimaryAttackMontage);
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::PrimaryAttack_TimeElapsed, AttackDelay);
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void AARCharacter::SecondaryAttack()
 {
-	PlayAnimMontage(SecondaryAttackMontage);
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::SecondaryAttack_TimeElapsed, AttackDelay);
+	ActionComp->StartActionByName(this, "Blackhole");
+}
+
+void AARCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void AARCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
 }
 
 void AARCharacter::Ability()
 {
-	PlayAnimMontage(AbilityMontage);
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AARCharacter::Ability_TimeElapsed, AttackDelay);
-}
-
-void AARCharacter::SecondaryAttack_TimeElapsed()
-{
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	
-	const FTransform SpawnTM = FTransform(GetControlRotation(), ProjectileSpawnLocation);
-
-	GetWorld()->SpawnActor<AActor>(WarpProjectileClass, SpawnTM, SpawnParams);
-}
-
-
-void AARCharacter::PrimaryAttack_TimeElapsed()
-{
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	FHitResult Hit;
-	FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams::AllObjects;
-	FVector TraceStart = CameraComp->GetComponentLocation();
-	FVector TraceEnd = TraceStart + CameraComp->GetForwardVector()*1000000;
-	bool bIsHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjectQueryParams);
-	UE_LOG(LogTemp, Warning, TEXT("Hit result: %s"), bIsHit ? TEXT("True") : TEXT("False"));
-
-	FRotator ProjectileSpawnRotation = bIsHit ? (Hit.ImpactPoint - HandLocation).Rotation() : GetControlRotation();
-	const FTransform SpawnTM = FTransform(ProjectileSpawnRotation, ProjectileSpawnLocation);
-
-	GetWorld()->SpawnActor<AActor>(MagicProjectileClass, SpawnTM, SpawnParams);
-}
-
-void AARCharacter::Ability_TimeElapsed()
-{
-	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const FVector ProjectileSpawnLocation = HandLocation + GetActorForwardVector() * 20.0f;
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	
-	const FTransform SpawnTM = FTransform(GetControlRotation(), ProjectileSpawnLocation);
-
-	GetWorld()->SpawnActor<AActor>(AbilityProjectileClass, SpawnTM, SpawnParams);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 void AARCharacter::PrimaryInteract()

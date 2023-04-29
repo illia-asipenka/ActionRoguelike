@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ARCharacter.generated.h"
 
+class UARActionComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UARInteractionComponent;
@@ -31,6 +32,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARAttributeComponent* AttributeComp;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARActionComponent* ActionComp;
+	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> MagicProjectileClass;
 
@@ -52,18 +56,13 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor,class UARAttributeComponent* OwningComp, float NewHealth, float Delta);
 
-	FTimerHandle AttackTimerHandle;
-	float AttackDelay;
-	float AbilityDelay;
-
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
 	void SecondaryAttack();
+	void SprintStart();
+	void SprintStop();
 	void Ability();
-	void SecondaryAttack_TimeElapsed();
-	void PrimaryAttack_TimeElapsed();
-	void Ability_TimeElapsed();
 	void PrimaryInteract();
 
 	virtual void PostInitializeComponents() override;
