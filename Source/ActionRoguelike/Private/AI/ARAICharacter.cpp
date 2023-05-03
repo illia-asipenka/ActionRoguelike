@@ -2,6 +2,8 @@
 
 
 #include "AI/ARAICharacter.h"
+
+#include "ARActionComponent.h"
 #include "ARAttributeComponent.h"
 #include "ARWorldUserWidget.h"
 #include "BrainComponent.h"
@@ -19,7 +21,8 @@ AARAICharacter::AARAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("SensingComponent");
-	AttributeComp = CreateDefaultSubobject<UARAttributeComponent>("HealthComponent");	
+	AttributeComp = CreateDefaultSubobject<UARAttributeComponent>("HealthComponent");
+	ActionComp = CreateDefaultSubobject<UARActionComponent>("ActionComponent");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);

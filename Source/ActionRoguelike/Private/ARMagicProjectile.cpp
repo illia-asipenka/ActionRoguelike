@@ -1,6 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARMagicProjectile.h"
+
+#include "ARActionComponent.h"
 #include "ARAttributeComponent.h"
 #include "ARCharacter.h"
 #include "ARGameplayFunctionLibrary.h"
@@ -57,15 +59,14 @@ void AARMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
-		// UARAttributeComponent* Attribute = Cast<UARAttributeComponent>(OtherActor->GetComponentByClass(UARAttributeComponent::StaticClass()));
-		// if(Attribute)
-		// {
-		// 	Attribute->ApplyHealthChange(GetInstigator(), -DamageAmount);
-		// 	
-		// 	UE_LOG(LogTemp, Warning, TEXT("Overlap Actor Name: %s"), *OtherActor->GetName());
-		//
-		// 	Explode();
-		// }
+		UARActionComponent* ActionComp = Cast<UARActionComponent>(OtherActor->GetComponentByClass(UARActionComponent::StaticClass()));
+		if(ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			ProjectileMovementComponent->Velocity = -ProjectileMovementComponent->Velocity;
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+		
 		if (UARGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();

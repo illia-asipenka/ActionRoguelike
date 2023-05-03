@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+  // Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ARGameplayFunctionLibrary.h"
@@ -22,7 +22,10 @@ bool UARGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser, AA
 		UPrimitiveComponent* HitComp = HitResult.GetComponent();
 		if(HitComp && HitComp->IsSimulatingPhysics(HitResult.BoneName))
 		{
-			HitComp->AddImpulseAtLocation(-HitResult.ImpactNormal * 300000.f, HitResult.ImpactPoint, HitResult.BoneName);
+			FVector Direction = HitResult.TraceEnd - HitResult.TraceStart;
+			Direction.Normalize();
+			
+			HitComp->AddImpulseAtLocation(Direction * 300000.f, HitResult.ImpactPoint, HitResult.BoneName);
 			UE_LOG(LogTemp, Warning, TEXT("Add impulse to %s"), *HitResult.BoneName.ToString());
 		}
 		return true;

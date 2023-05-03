@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ARProjectileBase.h"
+#include "GameplayTagContainer.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "ARMagicProjectile.generated.h"
 
@@ -21,8 +22,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float ProjectileSpeed = 500.0f;
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Damage")
 	float DamageAmount = 50.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FGameplayTag ParryTag;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	URadialForceComponent* RadialForceComponent;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

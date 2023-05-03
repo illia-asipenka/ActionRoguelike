@@ -8,6 +8,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "ARAICharacter.generated.h"
 
+class UARActionComponent;
 class UARAttributeComponent;
 
 UCLASS()
@@ -29,6 +30,8 @@ protected:
 	UPawnSensingComponent* PawnSensingComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UARAttributeComponent* AttributeComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UARActionComponent* ActionComp;
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
