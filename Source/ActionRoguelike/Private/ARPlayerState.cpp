@@ -10,12 +10,22 @@ int AARPlayerState::GetCreditsAmount() const
 
 void AARPlayerState::AddCredits(int AmountToAdd)
 {
+	if(!ensure(AmountToAdd > 0))
+	{
+		return;
+	}
+	
 	Credits += AmountToAdd;
 	OnCreditsChanged.Broadcast(Credits);
 }
 
 bool AARPlayerState::SubtractCredits(int AmountToSubtract)
 {
+	if(!ensure(AmountToSubtract > 0))
+	{
+		return false;
+	}
+	
 	const int NewCredits = Credits - AmountToSubtract;
 	
 	if(NewCredits < 0)

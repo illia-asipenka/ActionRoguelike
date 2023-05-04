@@ -18,20 +18,20 @@ class ACTIONROGUELIKE_API AARPlayerState : public APlayerState
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Credits")
 	int Credits = 0;
 
 public:
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Credits")
 	int GetCreditsAmount() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Credits")
 	void AddCredits(int AmountToAdd);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Credits")
 	bool SubtractCredits(int AmountToSubtract);
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category = "Credits")
 	FOnCreditsChanged OnCreditsChanged;
 	
 };

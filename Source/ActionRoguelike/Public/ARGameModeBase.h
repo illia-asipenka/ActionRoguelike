@@ -50,10 +50,8 @@ protected:
 	int PowerUpsToSpawn = 10;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
-	TSubclassOf<AARHealthPotion> HealthPotionClass;
+	TArray<TSubclassOf<AARHealthPotion>> PowerUpClasses;
 
-	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
-	TSubclassOf<AARPickUpCoin> PickUpCoinClass;
 
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);

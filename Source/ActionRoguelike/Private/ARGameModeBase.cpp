@@ -64,15 +64,12 @@ void AARGameModeBase::OnPowerUpQueryComplete(UEnvQueryInstanceBlueprintWrapper* 
 	for (int i = 0; i < MaxLoops; ++i)
 	{
 		float Chance = FMath::FRand();
-		if(Chance < 0.15f)
+		if(Chance < 0.10f)
 		{
-			bool ItemToSpawn = FMath::RandBool();
-			if(ItemToSpawn)
-				GetWorld()->SpawnActor<AActor>(PickUpCoinClass, FVector(Locations[i].X, Locations[i].Y, 70.f), FRotator::ZeroRotator);
-			else
-			{
-				GetWorld()->SpawnActor<AActor>(HealthPotionClass, FVector(Locations[i].X, Locations[i].Y, 70.f), FRotator::ZeroRotator);
-			}
+			const int32 RandomClassIndex = FMath::RandRange(0, PowerUpClasses.Num() - 1);
+			TSubclassOf<AActor> RandomPowerUpClass = PowerUpClasses[RandomClassIndex];
+			
+			GetWorld()->SpawnActor<AActor>(RandomPowerUpClass, FVector(Locations[i].X, Locations[i].Y, 70.f), FRotator::ZeroRotator);
 		}
 	}	
 }
