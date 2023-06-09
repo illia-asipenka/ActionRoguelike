@@ -61,6 +61,11 @@ void AARGameModeBase::OnPowerUpQueryComplete(UEnvQueryInstanceBlueprintWrapper* 
 
 	const int MaxLoops = Locations.Num();
 
+	if (MaxLoops <= 0)
+	{
+		return;
+	}
+	
 	for (int i = 0; i < MaxLoops; ++i)
 	{
 		float Chance = FMath::FRand();

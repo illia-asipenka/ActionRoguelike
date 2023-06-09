@@ -8,6 +8,7 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "ARMagicProjectile.generated.h"
 
+class UARActionEffect;
 UCLASS()
 class ACTIONROGUELIKE_API AARMagicProjectile : public AARProjectileBase
 {
@@ -26,6 +27,9 @@ protected:
 	float DamageAmount = 50.0f;
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<UARActionEffect> BurningActionClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	URadialForceComponent* RadialForceComponent;

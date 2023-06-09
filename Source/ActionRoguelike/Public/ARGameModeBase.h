@@ -50,7 +50,7 @@ protected:
 	int PowerUpsToSpawn = 10;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
-	TArray<TSubclassOf<AARHealthPotion>> PowerUpClasses;
+	TArray<TSubclassOf<AActor>> PowerUpClasses;
 
 
 	UFUNCTION()
