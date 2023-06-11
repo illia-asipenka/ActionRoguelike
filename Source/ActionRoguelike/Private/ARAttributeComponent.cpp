@@ -73,6 +73,44 @@ bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	return ActualDelta != 0;
 }
 
+bool UARAttributeComponent::AddRage(AActor* InstigatorActor, float HealthDelta)
+{
+	if(HealthDelta > 0)
+	{
+		return false;
+	}
+	
+	const float RageDelta = FMath::Abs(HealthDelta) * RageConversionRate;	
+	const float OldRage = Rage;
+
+	Rage = FMath::Clamp(Rage + RageDelta, 0.0f, RageMax);
+	const float ActualRageDelta = OldRage - Rage;
+	
+	UE_LOG(LogTemp, Warning, TEXT("Rage: %f"), Rage);
+
+	if(ActualRageDelta == 0)
+	{
+		return false;
+	}
+	
+	OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualRageDelta);	
+	return true;
+}
+
+bool UARAttributeComponent::SubtractRage(AActor* InstigatorActor, float RageDelta)
+{
+	if (RageDelta < 0 || RageDelta > Rage)
+	{
+		return false;
+	}
+	
+	Rage -= RageDelta;
+	UE_LOG(LogTemp, Warning, TEXT("Rage: %f"), Rage);	
+	OnRageChanged.Broadcast(InstigatorActor, this, Rage, RageDelta);
+	
+	return true; 
+}
+
 UARAttributeComponent* UARAttributeComponent::GetAttributes(AActor* FromActor)
 {
 	if(FromActor)

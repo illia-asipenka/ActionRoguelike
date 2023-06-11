@@ -78,6 +78,7 @@ void AARCharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeComponen
 	if(Delta < 0)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+		AttributeComp->AddRage(InstigatorActor, Delta); 
 	}
 
 	
