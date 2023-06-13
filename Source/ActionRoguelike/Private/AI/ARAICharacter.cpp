@@ -41,7 +41,23 @@ void AARAICharacter::PostInitializeComponents()
 
 void AARAICharacter::OnPawnSeen(APawn* Pawn)
 {
+	AARAIController* AIC = Cast<AARAIController>(GetController());
+	if(AIC)
+	{
+		UObject* Target = AIC->GetBlackboardComponent()->GetValueAsObject("TargetActor");
+
+		if(Pawn == Target)
+		{
+			UE_LOG(LogTemp, Display, TEXT("Already have Target!"));
+			return;
+		}
+	}
+	
 	SetTargetActor(Pawn);
+
+	UARWorldUserWidget* PlayerSpottedWidget = CreateWidget<UARWorldUserWidget>(GetWorld(), SpottedSignWidgetClass);
+	PlayerSpottedWidget->AttachedActor = this;
+	PlayerSpottedWidget->AddToViewport();
 	
 	DrawDebugString(GetWorld(), GetActorLocation(), "Player Spotted!!!", nullptr, FColor::White, 0.5f, true);
 }

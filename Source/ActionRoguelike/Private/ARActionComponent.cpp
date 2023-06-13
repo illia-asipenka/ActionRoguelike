@@ -56,6 +56,19 @@ void UARActionComponent::RemoveAction(UARAction* ActionToRemove)
 	Actions.Remove(ActionToRemove);
 }
 
+bool UARActionComponent::HasAction(TSubclassOf<UARAction> ActionToCheck)
+{
+	for(UARAction* Action : Actions)
+	{
+		if(Action->IsA(ActionToCheck))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool UARActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
 	for(UARAction* Action : Actions)

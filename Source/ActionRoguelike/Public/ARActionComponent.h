@@ -28,6 +28,9 @@ public:
 	void RemoveAction(UARAction* ActionToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
+	bool HasAction(TSubclassOf<UARAction> ActionToCheck);
+
+	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StartActionByName(AActor* Instigator, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")

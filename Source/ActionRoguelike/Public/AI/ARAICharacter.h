@@ -36,6 +36,8 @@ protected:
 	FName TimeToHitParamName;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> SpottedSignWidgetClass;
 
 	UARWorldUserWidget* ActiveHealthBar;
 
