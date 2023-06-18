@@ -14,13 +14,17 @@ class ACTIONROGUELIKE_API UARInteractionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-
-	void PrimaryInteract();
-public:	
+	
 	// Sets default values for this component's properties
 	UARInteractionComponent();
 
+	void PrimaryInteract();
+
 protected:
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InFocus);
+	
 	void FindBestInteractable();
 	// Called when the game starts
 	virtual void BeginPlay() override;

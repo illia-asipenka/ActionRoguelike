@@ -2,6 +2,7 @@
 
 
 #include "ARItemChest.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -18,19 +19,8 @@ AARItemChest::AARItemChest()
 
 	LidOpenedPitch = 110.0f;
 	bIsOpened = false;
-}
 
-// Called when the game starts or when spawned
-void AARItemChest::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AARItemChest::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	SetReplicates(true);
 }
 
 void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
@@ -41,8 +31,19 @@ void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
 void AARItemChest::ToggleChestLid()
 {
 	bIsOpened = !bIsOpened;
+	OnRep_LidOpened();
+	
+}
 
+void AARItemChest::OnRep_LidOpened()
+{
 	float NewLidPitch = bIsOpened? LidOpenedPitch : 0;
 	LidMeshComponent->SetRelativeRotation(FRotator(NewLidPitch, 0, 0));
 }
 
+void AARItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AARItemChest, bIsOpened);
+}

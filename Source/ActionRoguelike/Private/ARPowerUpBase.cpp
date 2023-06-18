@@ -10,6 +10,8 @@ AARPowerUpBase::AARPowerUpBase()
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetCollisionProfileName("PowerUp");
 	RootComponent = SphereComponent;
+
+	SetReplicates(true);
 }
 
 void AARPowerUpBase::BeginPlay()

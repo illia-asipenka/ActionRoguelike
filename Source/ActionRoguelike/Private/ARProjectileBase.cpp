@@ -24,6 +24,8 @@ AARProjectileBase::AARProjectileBase()
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
+
+	SetReplicates(true);
 }
 
 void AARProjectileBase::PostInitializeComponents()

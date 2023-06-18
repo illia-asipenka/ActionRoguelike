@@ -13,31 +13,28 @@ class ACTIONROGUELIKE_API AARItemChest : public AActor, public IARGameplayInterf
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
-	AARItemChest();
+	
+	AARItemChest();	
 
-public:
-	UPROPERTY(EditAnywhere)
-	float LidOpenedPitch;
+	virtual void Interact_Implementation(APawn* InstigatorPawn);
 
-	bool bIsOpened;
+	UFUNCTION(BlueprintCallable)
+	void ToggleChestLid();	
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_LidOpened();
+	
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ChestMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMeshComponent;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere)
+	float LidOpenedPitch;
 
-	virtual void Interact_Implementation(APawn* InstigatorPawn);
-
-	UFUNCTION(BlueprintCallable)
-	void ToggleChestLid();
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", BlueprintReadOnly)
+	bool bIsOpened;
 };
