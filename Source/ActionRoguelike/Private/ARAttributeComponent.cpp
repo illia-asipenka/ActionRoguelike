@@ -4,6 +4,7 @@
 #include "ARAttributeComponent.h"
 
 #include "ARGameModeBase.h"
+#include "Net/UnrealNetwork.h"
 
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), 1.0f, TEXT(""), ECVF_Cheat);
@@ -13,6 +14,8 @@ static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplie
 UARAttributeComponent::UARAttributeComponent()
 {
 	Health = HealthMax;
+
+	SetIsReplicatedByDefault(true);
 }
 
 bool UARAttributeComponent::Kill(AActor* InstigatorActor)
@@ -54,7 +57,11 @@ bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 
 	const float ActualDelta = Health - OldHealth;
 
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
+	//OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
+	if(ActualDelta != 0.0f)
+	{
+		MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
 
@@ -129,4 +136,17 @@ bool UARAttributeComponent::IsActorAlive(AActor* Actor)
 		return AttributeComp->IsAlive();
 	}
 	return false;
+}
+
+void UARAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta);
+}
+
+void UARAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UARAttributeComponent, Health);
+	DOREPLIFETIME(UARAttributeComponent, HealthMax);
 }
