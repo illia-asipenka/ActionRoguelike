@@ -7,6 +7,8 @@
 UARActionComponent::UARActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	SetIsReplicatedByDefault(true);
 }
 
 void UARActionComponent::BeginPlay()
@@ -81,6 +83,11 @@ bool UARActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FailedMsg);
 				continue;
 			}
+			// Is Client?
+			if(!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator, ActionName);
+			}
 			
 			Action->StartAction(Instigator);
 			return true;
@@ -107,3 +114,7 @@ bool UARActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	return false;
 }
 
+void UARActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StartActionByName(Instigator, ActionName);
+}
