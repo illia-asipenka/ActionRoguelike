@@ -15,31 +15,26 @@ UARActionEffect_Thorns::UARActionEffect_Thorns()
 
 void UARActionEffect_Thorns::ReflectDamage(AActor* DamageInstigator, UARAttributeComponent* OwningComponent, float NewHealth, float DamageReceived)
 {
-	if(DamageReceived > 0.0f)
-	{
-		return;
-	}
 	AActor* Owner = GetOwningComponent()->GetOwner();
 
-	if(DamageInstigator == Owner)
+	if(DamageReceived < 0.0f && DamageInstigator != Owner)
 	{
-		return;
-	}
-	
-	float DamageFromThorns = FMath::CeilToInt(-(DamageReceived * DamageFraction));
+		int32 DamageFromThorns = FMath::RoundToInt(DamageReceived * DamageFraction);
 
-	if (DamageFromThorns == 0)
-	{
-		return;
-	}
-	
-	UE_LOG(LogTemp, Warning, TEXT("ThornsDamage: %f"), DamageFromThorns);
+		if (DamageFromThorns == 0)
+		{
+			return;
+		}
 
+		DamageFromThorns = FMath::Abs(DamageFromThorns);
+		
+		UE_LOG(LogTemp, Warning, TEXT("ThornsDamage: %d"), DamageFromThorns);
 
-	if(ensure(Owner))
-	{
-		UARGameplayFunctionLibrary::ApplyDamage(Owner, DamageInstigator, DamageFromThorns);
-	}
+		if(ensure(Owner))
+		{
+			UARGameplayFunctionLibrary::ApplyDamage(Owner, DamageInstigator, DamageFromThorns);
+		}
+	}	
 }
 
 void UARActionEffect_Thorns::StartAction_Implementation(AActor* Instigator)

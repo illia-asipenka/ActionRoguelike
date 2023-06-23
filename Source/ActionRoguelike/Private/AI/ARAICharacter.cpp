@@ -57,7 +57,7 @@ void AARAICharacter::OnPawnSeen(APawn* Pawn)
 
 	UARWorldUserWidget* PlayerSpottedWidget = CreateWidget<UARWorldUserWidget>(GetWorld(), SpottedSignWidgetClass);
 	PlayerSpottedWidget->AttachedActor = this;
-	PlayerSpottedWidget->AddToViewport();
+	PlayerSpottedWidget->AddToViewport(10);
 	
 	DrawDebugString(GetWorld(), GetActorLocation(), "Player Spotted!!!", nullptr, FColor::White, 0.5f, true);
 }
