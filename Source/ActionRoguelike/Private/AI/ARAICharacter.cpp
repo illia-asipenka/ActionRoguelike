@@ -55,9 +55,7 @@ void AARAICharacter::OnPawnSeen(APawn* Pawn)
 	
 	SetTargetActor(Pawn);
 
-	UARWorldUserWidget* PlayerSpottedWidget = CreateWidget<UARWorldUserWidget>(GetWorld(), SpottedSignWidgetClass);
-	PlayerSpottedWidget->AttachedActor = this;
-	PlayerSpottedWidget->AddToViewport(10);
+	MulticastAddPlayerSpottedWidget();
 	
 	DrawDebugString(GetWorld(), GetActorLocation(), "Player Spotted!!!", nullptr, FColor::White, 0.5f, true);
 }
@@ -106,6 +104,13 @@ void AARAICharacter::OnHealthChanged(AActor* InstigatorActor, UARAttributeCompon
 			SetLifeSpan(10.0f);
 		}
 	}
+}
+
+void AARAICharacter::MulticastAddPlayerSpottedWidget_Implementation()
+{
+	UARWorldUserWidget* PlayerSpottedWidget = CreateWidget<UARWorldUserWidget>(GetWorld(), SpottedSignWidgetClass);
+	PlayerSpottedWidget->AttachedActor = this;
+	PlayerSpottedWidget->AddToViewport(10);
 }
 
 bool AARAICharacter::IsLowHealth()

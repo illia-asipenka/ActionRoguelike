@@ -10,7 +10,7 @@ AARPickUpAction::AARPickUpAction()
 {
 	ActionMesh = CreateDefaultSubobject<UStaticMeshComponent>("ActionMesh");
 	ActionMesh->SetupAttachment(RootComponent);
-	ActionMesh->SetCollisionProfileName("NoCollision");
+	ActionMesh->SetCollisionProfileName("NoCollision"); 
 }
 
 bool AARPickUpAction::CheckInteractConditions_Implementation(APawn* InstigatorPawn)

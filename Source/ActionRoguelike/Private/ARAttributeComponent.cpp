@@ -14,6 +14,7 @@ static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplie
 UARAttributeComponent::UARAttributeComponent()
 {
 	Health = HealthMax;
+	Rage = 0.0f;
 
 	SetIsReplicatedByDefault(true);
 }
@@ -99,8 +100,8 @@ bool UARAttributeComponent::AddRage(AActor* InstigatorActor, float HealthDelta)
 	{
 		return false;
 	}
-	
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualRageDelta);	
+	MulticastRageChanged(InstigatorActor, Rage, RageDelta);
+	//OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualRageDelta);	
 	return true;
 }
 
@@ -112,8 +113,9 @@ bool UARAttributeComponent::SubtractRage(AActor* InstigatorActor, float RageDelt
 	}
 	
 	Rage -= RageDelta;
-	UE_LOG(LogTemp, Warning, TEXT("Rage: %f"), Rage);	
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, RageDelta);
+	UE_LOG(LogTemp, Warning, TEXT("Rage: %f"), Rage);
+	MulticastRageChanged(InstigatorActor, Rage, RageDelta);
+	//OnRageChanged.Broadcast(InstigatorActor, this, Rage, RageDelta);
 	
 	return true; 
 }
@@ -138,6 +140,11 @@ bool UARAttributeComponent::IsActorAlive(AActor* Actor)
 	return false;
 }
 
+void UARAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, Rage, Delta);	
+}
+
 void UARAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
 {
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta);
@@ -149,4 +156,6 @@ void UARAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(UARAttributeComponent, Health);
 	DOREPLIFETIME(UARAttributeComponent, HealthMax);
+	DOREPLIFETIME(UARAttributeComponent, Rage);
+	DOREPLIFETIME(UARAttributeComponent, RageMax);
 }

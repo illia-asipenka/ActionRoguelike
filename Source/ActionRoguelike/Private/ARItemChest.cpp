@@ -19,8 +19,7 @@ AARItemChest::AARItemChest()
 
 	LidOpenedPitch = 110.0f;
 	bIsOpened = false;
-
-	SetReplicates(true);
+	bReplicates = true;
 }
 
 void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)

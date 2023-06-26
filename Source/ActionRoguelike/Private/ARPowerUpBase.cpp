@@ -3,6 +3,8 @@
 
 #include "ARPowerUpBase.h"
 
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values
 AARPowerUpBase::AARPowerUpBase()
@@ -10,8 +12,8 @@ AARPowerUpBase::AARPowerUpBase()
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetCollisionProfileName("PowerUp");
 	RootComponent = SphereComponent;
-
-	SetReplicates(true);
+	SphereComponent->SetIsReplicated(true);
+	bReplicates = true;
 }
 
 void AARPowerUpBase::BeginPlay()
@@ -26,7 +28,7 @@ void AARPowerUpBase::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if(CheckInteractConditions(InstigatorPawn))
 	{
-		ApplyPowerUpEffect(InstigatorPawn); 
+		ApplyPowerUpEffect(InstigatorPawn);
 		SetRespawnTimer();
 	}
 }
@@ -48,13 +50,26 @@ void AARPowerUpBase::SetRespawnTimer()
 	GetWorld()->GetTimerManager().SetTimer(TimerToRespawn,this, &AARPowerUpBase::ShowPowerUp, RespawnSeconds);
 }
 
-void AARPowerUpBase::TogglePowerUpVisibility(bool NewVisibility)
+void AARPowerUpBase::TogglePowerUpVisibility(bool NewActive)
 {
-	SetActorEnableCollision(NewVisibility);
-	RootComponent->SetVisibility(NewVisibility, true);
+	bActive = NewActive;
+	OnRep_Active();
 }
 
 void AARPowerUpBase::ShowPowerUp()
 {
 	TogglePowerUpVisibility(true);
+}
+
+void AARPowerUpBase::OnRep_Active()
+{
+	SetActorEnableCollision(bActive);
+	RootComponent->SetVisibility(bActive, true);
+}
+
+void AARPowerUpBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AARPowerUpBase, bActive);
 }

@@ -29,6 +29,8 @@ protected:
 	bool bSpawnFromStart = true;
 	UPROPERTY()
 	FTimerHandle TimerToRespawn;
+	UPROPERTY(ReplicatedUsing = OnRep_Active, BlueprintReadOnly)
+	bool bActive = true;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void ApplyPowerUpEffect(APawn* InstigatorPawn);
@@ -37,7 +39,9 @@ protected:
 	UFUNCTION()
 	void SetRespawnTimer();	
 	UFUNCTION()
-	void TogglePowerUpVisibility(bool NewVisibility);
+	void TogglePowerUpVisibility(bool NewActive);
 	UFUNCTION()
-	void ShowPowerUp();	
+	void ShowPowerUp();
+	UFUNCTION()
+	void OnRep_Active();
 };

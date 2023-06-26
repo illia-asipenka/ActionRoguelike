@@ -2,13 +2,14 @@
 
 
 #include "ARPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 int AARPlayerState::GetCreditsAmount() const
 {
 	return Credits;
 }
 
-void AARPlayerState::AddCredits(int AmountToAdd)
+void AARPlayerState::AddCredits(int32 AmountToAdd)
 {
 	if(!ensure(AmountToAdd > 0))
 	{
@@ -16,12 +17,16 @@ void AARPlayerState::AddCredits(int AmountToAdd)
 	}
 	
 	Credits += AmountToAdd;
-	OnCreditsChanged.Broadcast(Credits);
+	
+	if(HasAuthority())
+	{
+		OnCreditsChanged.Broadcast(this, Credits, AmountToAdd); 
+	}
 }
 
-bool AARPlayerState::SubtractCredits(int AmountToSubtract)
+bool AARPlayerState::SubtractCredits(int32 AmountToSubtract)
 {
-	if(!ensure(AmountToSubtract > 0))
+	if(AmountToSubtract < 0)
 	{
 		return false;
 	}
@@ -34,7 +39,23 @@ bool AARPlayerState::SubtractCredits(int AmountToSubtract)
 	}
 	
 	Credits = NewCredits;
-	OnCreditsChanged.Broadcast(Credits);
+	
+	if(HasAuthority())
+	{
+		OnCreditsChanged.Broadcast(this, Credits, -AmountToSubtract);
+	}
 	
 	return true;
+}
+
+void AARPlayerState::OnRep_Credits(int32 OldCredits)
+{
+	OnCreditsChanged.Broadcast(this, Credits, Credits - OldCredits);
+}
+
+void AARPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AARPlayerState, Credits);
 }

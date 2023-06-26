@@ -47,4 +47,6 @@ protected:
 	void OnPawnSeen(APawn* Pawn);
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UARAttributeComponent* OwningComp, float NewHealth, float Delta);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastAddPlayerSpottedWidget();
 };
