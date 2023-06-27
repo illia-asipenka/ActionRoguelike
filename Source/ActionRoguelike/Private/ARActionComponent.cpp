@@ -2,6 +2,9 @@
 
 #include "ARActionComponent.h"
 #include "ARAction.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 
 
 UARActionComponent::UARActionComponent()
@@ -14,19 +17,32 @@ UARActionComponent::UARActionComponent()
 void UARActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	for (TSubclassOf<UARAction> ActionClass : DefaultActions)
+
+	//Server only
+	if (GetOwner()->HasAuthority())
 	{
-		AddAction(GetOwner() ,ActionClass);
-	}
+		for (TSubclassOf<UARAction> ActionClass : DefaultActions)
+		{
+			AddAction(GetOwner() ,ActionClass);
+		}
+	}	
 }
 
 void UARActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+	//FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+
+	for (UARAction* Action : Actions)
+	{
+		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+
+		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	}
 }
 
 void UARActionComponent::AddAction(AActor* Instigator, TSubclassOf<UARAction> ActionClass)
@@ -36,9 +52,10 @@ void UARActionComponent::AddAction(AActor* Instigator, TSubclassOf<UARAction> Ac
 		return;
 	}
 
-	UARAction* NewAction = NewObject<UARAction>(this, ActionClass);
+	UARAction* NewAction = NewObject<UARAction>(GetOwner(), ActionClass);
 	if (ensure(NewAction))
 	{
+		NewAction->Initialize(this);
 		Actions.Add(NewAction);
 
 		if(NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
@@ -117,4 +134,27 @@ bool UARActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 void UARActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
 {
 	StartActionByName(Instigator, ActionName);
+}
+
+void UARActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UARActionComponent, Actions);
+}
+
+
+bool UARActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+
+	for (UARAction* Action : Actions)
+	{
+		if(Action)
+		{
+			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
+		}
+	}
+	
+	return WroteSomething;
 }
