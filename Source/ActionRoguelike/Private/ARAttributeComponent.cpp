@@ -54,7 +54,7 @@ bool UARAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	
 	const float OldHealth = Health;
 	const float NewHealth = FMath::Clamp(Health + Delta, 0.0f, HealthMax);;
-	const float ActualDelta = Health - OldHealth;
+	const float ActualDelta = NewHealth - OldHealth;
 
 	if (GetOwner()->HasAuthority())
 	{

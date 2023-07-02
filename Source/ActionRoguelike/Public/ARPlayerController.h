@@ -7,6 +7,7 @@
 #include "ARPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateChanged, APlayerState*, NewPlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPawnChanged, APawn*, NewPawn);
 /**
  * 
  */
@@ -18,5 +19,9 @@ class ACTIONROGUELIKE_API AARPlayerController : public APlayerController
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStateChanged OnPlayerStateReceived;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnPawnChanged OnPawnChanged;
+
 	virtual void OnRep_PlayerState() override;
+	virtual void SetPawn(APawn* InPawn) override;
 };

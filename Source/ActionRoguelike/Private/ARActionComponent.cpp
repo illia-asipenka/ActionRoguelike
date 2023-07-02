@@ -45,10 +45,16 @@ void UARActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	}
 }
 
-void UARActionComponent::AddAction(AActor* Instigator, TSubclassOf<UARAction> ActionClass)
+void UARActionComponent::AddAction(AActor* Instigator, TSubclassOf<UARAction> ActionClass) 
 {
 	if(!ensureAlways(ActionClass))
 	{
+		return;
+	}
+
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client attempting to AddAction. [Class: %s]"), *GetNameSafe(ActionClass));
 		return;
 	}
 
@@ -122,6 +128,12 @@ bool UARActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 		{
 			if (Action->IsRunning())
 			{
+				// Is Client?
+				if(!GetOwner()->HasAuthority())
+				{
+					ServerStopAction(Instigator, ActionName);
+				}
+				
 				Action->StopAction(Instigator);
 				return true;
 			}			
@@ -134,6 +146,11 @@ bool UARActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 void UARActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
 {
 	StartActionByName(Instigator, ActionName);
+}
+
+void UARActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StopActionByName(Instigator, ActionName);
 }
 
 void UARActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
