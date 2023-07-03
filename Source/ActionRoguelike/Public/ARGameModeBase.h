@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "ARGameModeBase.generated.h"
 
+class UARSaveGame;
 class AARPickUpCoin;
 class AARHealthPotion;
 class UEnvQuery;
@@ -22,11 +23,26 @@ class ACTIONROGUELIKE_API AARGameModeBase : public AGameModeBase
 public:
 	virtual void StartPlay() override;
 
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 	UFUNCTION()
 	virtual void OnActorKilled(AActor* Victim, AActor* Killer);
 
+	UFUNCTION(Exec)
+	void KillAll();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
+
 protected:
+
+	FString SlotName;
 	FTimerHandle TimerHandle_SpawnBots;
+
+	UPROPERTY()
+	UARSaveGame* CurrentSaveGame;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<AActor> MinionClass;
@@ -62,9 +78,10 @@ protected:
 	void SpawnBotTimerElapsed();
 	void SpawnPowerUps();
 
-	UFUNCTION(Exec)
-	void KillAll();
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;	
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
+
+	
 };

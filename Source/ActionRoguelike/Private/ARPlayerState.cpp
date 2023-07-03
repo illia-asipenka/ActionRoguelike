@@ -2,6 +2,7 @@
 
 
 #include "ARPlayerState.h"
+#include "ARSaveGame.h"
 #include "Net/UnrealNetwork.h"
 
 int AARPlayerState::GetCreditsAmount() const
@@ -58,4 +59,20 @@ void AARPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AARPlayerState, Credits);
+}
+
+void AARPlayerState::SavePlayerState_Implementation(UARSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;
+	}
+}
+
+void AARPlayerState::LoadPlayerState_Implementation(UARSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		Credits = SaveObject->Credits;
+	}
 }

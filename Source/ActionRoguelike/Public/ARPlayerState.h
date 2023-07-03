@@ -6,11 +6,10 @@
 #include "GameFramework/PlayerState.h"
 #include "ARPlayerState.generated.h"
 
-/**
- * 
- */
+class UARSaveGame;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, AARPlayerState*, PlayerState, int32, NewCreditsAmount, int32, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, AARPlayerState*, PlayerState, int32, NewCreditsAmount,
+                                               int32, Delta);
 
 UCLASS()
 class ACTIONROGUELIKE_API AARPlayerState : public APlayerState
@@ -35,5 +34,11 @@ public:
 	void OnRep_Credits(int32 OldCredits);
 
 	UPROPERTY(BlueprintAssignable, Category = "Credits")
-	FOnCreditsChanged OnCreditsChanged;	
+	FOnCreditsChanged OnCreditsChanged;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(UARSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(UARSaveGame* SaveObject);
 };
