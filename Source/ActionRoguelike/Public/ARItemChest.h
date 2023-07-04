@@ -18,6 +18,8 @@ public:
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
 
+	virtual void OnActorLoaded_Implementation() override;
+
 	UFUNCTION(BlueprintCallable)
 	void ToggleChestLid();	
 
@@ -35,6 +37,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float LidOpenedPitch;
 
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", BlueprintReadOnly, SaveGame)
 	bool bIsOpened;
 };

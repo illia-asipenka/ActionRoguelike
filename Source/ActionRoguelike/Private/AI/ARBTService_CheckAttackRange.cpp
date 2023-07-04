@@ -27,7 +27,7 @@ void UARBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, 
 
 					bool bWithinRange = DistanceTo < 1000.0f;
 
-					bool bHasLOS;
+					bool bHasLOS = false;
 
 					if(bWithinRange)
 					{

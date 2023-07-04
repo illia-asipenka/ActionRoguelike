@@ -27,6 +27,11 @@ void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	ToggleChestLid();
 }
 
+void AARItemChest::OnActorLoaded_Implementation()
+{
+	OnRep_LidOpened();
+}
+
 void AARItemChest::ToggleChestLid()
 {
 	bIsOpened = !bIsOpened;
