@@ -73,6 +73,7 @@ void AARPlayerState::LoadPlayerState_Implementation(UARSaveGame* SaveObject)
 {
 	if (SaveObject)
 	{
-		Credits = SaveObject->Credits;
+		//Credits = SaveObject->Credits;
+		AddCredits(SaveObject->Credits);
 	}
 }
