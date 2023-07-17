@@ -33,6 +33,11 @@ void AARPowerUpBase::Interact_Implementation(APawn* InstigatorPawn)
 	}
 }
 
+FText AARPowerUpBase::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void AARPowerUpBase::ApplyPowerUpEffect_Implementation(APawn* InstigatorPawn)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Power up effect is not implemented!"));

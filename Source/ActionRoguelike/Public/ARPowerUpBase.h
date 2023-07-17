@@ -16,6 +16,8 @@ class ACTIONROGUELIKE_API AARPowerUpBase : public AActor, public IARGameplayInte
 public:
 	AARPowerUpBase();
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
+	
 
 protected:
 	virtual void BeginPlay() override;
