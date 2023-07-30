@@ -22,6 +22,8 @@ AARMagicProjectile::AARMagicProjectile()
 	RadialForceComponent->ImpulseStrength = 500.0f;
 	RadialForceComponent->bImpulseVelChange = true;
 	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
+
+	InitialLifeSpan = 10.0f;
 }
 
 void AARMagicProjectile::BeginPlay()
