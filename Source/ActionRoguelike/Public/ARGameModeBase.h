@@ -10,7 +10,6 @@
 
 class UARMonsterData;
 class UDataTable;
-class UARSaveGame;
 class AARPickUpCoin;
 class AARHealthPotion;
 class UEnvQuery;
@@ -64,18 +63,9 @@ public:
 	UFUNCTION(Exec)
 	void KillAll();
 
-	UFUNCTION(BlueprintCallable, Category = "SaveGame")
-	void WriteSaveGame();
-
-	void LoadSaveGame();
-
 protected:
 
-	FString SlotName;
 	FTimerHandle TimerHandle_SpawnBots;
-
-	UPROPERTY()
-	UARSaveGame* CurrentSaveGame;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UDataTable* MonsterTable;
@@ -119,7 +109,5 @@ protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;	
 
 	UFUNCTION()
-	void RespawnPlayerElapsed(AController* Controller);
-
-	
+	void RespawnPlayerElapsed(AController* Controller);	
 };

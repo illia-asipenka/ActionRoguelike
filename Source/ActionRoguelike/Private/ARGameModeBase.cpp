@@ -6,10 +6,9 @@
 #include "ARActionComponent.h"
 #include "ARAttributeComponent.h"
 #include "ARCharacter.h"
-#include "ARGameplayInterface.h"
 #include "ARMonsterData.h"
 #include "ARPlayerState.h"
-#include "ARSaveGame.h"
+#include "ARSaveGameSubsystem.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "ActionRoguelike/ActionRoguelike.h"
@@ -19,22 +18,22 @@
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT(""), ECVF_Cheat);
 
 AARGameModeBase::AARGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
-
-	SlotName = "SaveGame01";
 }
 
 void AARGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	LoadSaveGame();
+	UARSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UARSaveGameSubsystem>();
+
+	FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");	
+	SG->LoadSaveGame(SelectedSaveSlot);
 }
 
 void AARGameModeBase::StartPlay()
@@ -47,11 +46,8 @@ void AARGameModeBase::StartPlay()
 
 void AARGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	AARPlayerState* PS = NewPlayer->GetPlayerState<AARPlayerState>();
-	if (ensure(PS))
-	{
-		PS->LoadPlayerState(CurrentSaveGame);
-	}
+	UARSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UARSaveGameSubsystem>();
+	SG->HandleStartingNewPlayer(NewPlayer);
 
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
@@ -230,6 +226,10 @@ void AARGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
 
 		float RespawnDelay = 1.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, OnPlayerKilled, RespawnDelay, false);
+
+		
+		UARSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UARSaveGameSubsystem>();
+		SG->WriteSaveGame();
 	}
 
 	Player = Cast<AARCharacter>(Killer);
@@ -256,96 +256,5 @@ void AARGameModeBase::RespawnPlayerElapsed(AController* Controller)
 		UE_LOG(LogTemp, Log, TEXT("About to restart player"));
 		
 		RestartPlayer(Controller);		
-	}
-}
-
-void AARGameModeBase::WriteSaveGame()
-{
-	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
-	{
-		AARPlayerState* PS = Cast<AARPlayerState>(GameState->PlayerArray[i]);
-		if (PS)
-		{
-			PS->SavePlayerState(CurrentSaveGame);
-			break; // single player only at this point
-		}
-	}
-
-	CurrentSaveGame->SavedActors.Empty();
-
-	for (FActorIterator It(GetWorld()); It; ++It)
-	{
-		AActor* Actor = *It;
-		//Only interested in our 'gameplay actors'
-		if(!Actor->Implements<UARGameplayInterface>())
-		{
-			continue;
-		}
-
-		FActorSaveData ActorData;
-		ActorData.ActorName = Actor->GetName();
-		ActorData.Transform = Actor->GetActorTransform();
-
-		// Pass the array to fill with data from Actor
-		FMemoryWriter MemWriter(ActorData.ByteData);
-		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
-		// Find only variables with UPROPERTY(SaveGame)
-		Ar.ArIsSaveGame = true;
-		// Convert Actor's SaveGame UPROPERTIES into binary array
-		Actor->Serialize(Ar);
-
-		CurrentSaveGame->SavedActors.Add(ActorData);
-	}	
-	
-	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
-}
-
-void AARGameModeBase::LoadSaveGame()
-{
-	if(UGameplayStatics::DoesSaveGameExist(SlotName, 0))
-	{
-		CurrentSaveGame = Cast<UARSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-
-		if (CurrentSaveGame == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
-			return;
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("Loaded SaveGame Data."));
-
-		for (FActorIterator It(GetWorld()); It; ++It)
-		{
-			AActor* Actor = *It;
-			//Only interested in our 'gameplay actors'
-			if(!Actor->Implements<UARGameplayInterface>())
-			{
-				continue;
-			}
-
-			for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
-			{
-				if(ActorData.ActorName == Actor->GetName())
-				{
-					Actor->SetActorTransform(ActorData.Transform);
-
-					FMemoryReader MemReader(ActorData.ByteData);
-					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
-					Ar.ArIsSaveGame = true;
-					// Convert binary array back into actor's variables
-					Actor->Serialize(Ar);
-
-					IARGameplayInterface::Execute_OnActorLoaded(Actor);
-					
-					break;
-				}
-			}
-		}	
-	}
-	else
-	{
-		CurrentSaveGame = Cast<UARSaveGame>(UGameplayStatics::CreateSaveGameObject(UARSaveGame::StaticClass()));
-
-		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data."));
 	}
 }
