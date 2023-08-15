@@ -44,7 +44,7 @@ void AARProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Ot
 	}
 }
 
-void AARProjectileBase::Explode_Implementation()
+void AARProjectileBase:: Explode_Implementation()
 {
 	if (ensure(!IsPendingKill()))
 	{

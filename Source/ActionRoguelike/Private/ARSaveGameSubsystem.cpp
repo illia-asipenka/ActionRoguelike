@@ -45,7 +45,6 @@ void UARSaveGameSubsystem::SetSlotName(FString NewSlotName)
 void UARSaveGameSubsystem::WriteSaveGame()
 {
 	CurrentSaveGame->SavedActors.Empty();
-	CurrentSaveGame->SavedActors.Empty();
 	
 	AGameStateBase* GS = GetWorld()->GetGameState();
 
@@ -63,8 +62,6 @@ void UARSaveGameSubsystem::WriteSaveGame()
 			break; // single player only at this point
 		}
 	}
-
-	CurrentSaveGame->SavedActors.Empty();
 
 	for (FActorIterator It(GetWorld()); It; ++It)
 	{

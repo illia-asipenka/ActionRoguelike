@@ -22,7 +22,7 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float ProjectileSpeed = 500.0f;
+	float ProjectileSpeed = 4000.0f;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Damage")
 	float DamageAmount = 50.0f;
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")

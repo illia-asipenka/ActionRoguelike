@@ -26,7 +26,7 @@ public:
 
 protected:
 
-	UFUNCTION(NetMulticast, Reliable) //@FIXME: mark as unreliable once we moved the 'state' out of archaracter
+	UFUNCTION(NetMulticast, Unreliable) //@FIXME: mark as unreliable once we moved the 'state' out of archaracter
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 	UFUNCTION(NetMulticast, Unreliable)

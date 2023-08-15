@@ -23,6 +23,8 @@ AARMagicProjectile::AARMagicProjectile()
 	RadialForceComponent->bImpulseVelChange = true;
 	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
 
+	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
+
 	InitialLifeSpan = 10.0f;
 }
 

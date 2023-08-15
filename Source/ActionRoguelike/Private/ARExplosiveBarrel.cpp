@@ -25,15 +25,14 @@ AARExplosiveBarrel::AARExplosiveBarrel()
 // Called when the game starts or when spawned
 void AARExplosiveBarrel::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 void AARExplosiveBarrel::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	StaticMeshComponent->OnComponentHit.AddDynamic(this, &AARExplosiveBarrel::Explode);
+	StaticMeshComponent->OnComponentHit.AddUniqueDynamic(this, &AARExplosiveBarrel::Explode);
 }
 
 // Called every frame
